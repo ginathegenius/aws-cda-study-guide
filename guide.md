@@ -71,7 +71,7 @@ When a consumer receives and processes a message from the queue, the message rem
 
 #### Dead-Letter Queues
 
-Allows you to set aside and isolate messages that cant be processed correctly to determine why their processing didn't succeed.
+Allows you to set aside and isolate messages that cant be processed correctly to determine why their processing didn't succeed. Allows you to prevent data loss.
 
 ##### When to use
 
@@ -97,6 +97,8 @@ Allows you to set aside and isolate messages that cant be processed correctly to
     - Customer encrypts files before upload by leveraging AWS Encryption SDK
 
 ## Elastic Beanstalk
+### Supported Platforms
+Programming languages (Go, Java, Node.js, PHP, Python, Ruby), application servers (Tomcat, Passenger, Puma), and Docker containers
 ### Deployment Options
  <table>
   <tr>
@@ -152,6 +154,7 @@ Configure cross account access by creating a role in your account which has perm
 What permissions need to be configured to allow CodeDeploy to perform the deployment to EC2?
 Create an IAM policy with an acton to allow `codecommit:GitPull` on the required repository. Attach the policy to the EC2 instance profile role.
 #### Appspec file
+- The AppSpec file (appspec.yml) must always be in the root or your application source directory otherwise the deployment will not work
 ##### Hooks
 1. ApplicationStop	
 2. DownloadBundle	
@@ -182,4 +185,3 @@ Termination Protection
 - cfn-init helper script can be used to install packages, create files, and start/stop services 
 
 ## Kinesis
-
