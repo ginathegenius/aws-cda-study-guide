@@ -1,12 +1,14 @@
 # AWS Certified Developer Associate
 ## Table of Contents
+- [Serverless](#serverless)
+  - [DynamoDB](#dynamodb)
+  - [SQS](#sqs)
+  - [S3](#s3)
 - [Elastic Beanstalk](#elastic-beanstalk)
-- [SQS](#sqs)
-- [S3](#s3)
 - [IAM](#iam)
-- [Cognito](#dynamodb)
+- [Cognito](#cognito)
+- [Security Token Service](#security-token-service)
 - [ECS](#dynamodb)
-- [DynamoDB](#dynamodb)
 - [CI/CD](#ci-cd)
 
 ## Serverless
@@ -15,6 +17,9 @@
 - Primary key attribute must be defined as type string, number, or binary
 
 #### Query vs Scan 
+| Query | Scan|
+|---|--|
+|finds items based on primary key values|reads every item in a table or a secondary index|
 
 #### Indexes
 | Local Secondary Index | Global Secondary Index|
@@ -141,7 +146,26 @@ Configure cross account access by creating a role in your account which has perm
 ### AWS identity federation process
 
 ## Cognito 
+Amazon Cognito provides authentication, authorization, and user management for your web and mobile apps. Your users can sign in directly with a user name and password, or through a third party such as Facebook, Amazon, Google or Apple.
 
+### User pools
+User pools are user directories that provide sign-up and sign-in options for your app users. With a user pool, your users can sign in to your web or mobile app through Amazon Cognito, or federate through a third-party identity provider (IdP). Whether your users sign in directly or through a third party, all members of the user pool have a directory profile that you can access through an SDK.
+
+### Cognito sync
+Amazon Cognito Sync is an AWS service and client library that enables cross-device syncing of application-related user data. You can use it to synchronize user profile data across mobile devices and the web without requiring your own backend. The client libraries cache data locally so your app can read and write data regardless of device connectivity status. When the device is online, you can synchronize data, and if you set up push sync, notify other devices immediately that an update is available.
+
+#### Cognito Streams
+
+#### Cognito Events
+
+### Identity pools
+Identity pools enable you to grant your users access to other AWS services.
+
+
+
+## Security Token Service
+### AssumeRoleWithWebIdentity
+STS AssumeRoleWithWebIdentity returns a set of temporary security credentials for users who have been authenticated in a mobile or web application with a web identity provider.
 
 ## ECS 
 
@@ -181,7 +205,7 @@ docker push $REPOSITORY_URI:latest
 ```
 
 ## Cloudformation
-Termination Protection
+- Termination Protection - can be enabled to prevent a stack from being accidentally deleted
 - cfn-init helper script can be used to install packages, create files, and start/stop services 
 
 ## Kinesis
