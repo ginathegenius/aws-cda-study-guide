@@ -1,6 +1,7 @@
 # AWS Certified Developer Associate
 ## Table of Contents
 - [Serverless](#serverless)
+  - [Lambda](#lambda)
   - [DynamoDB](#dynamodb)
   - [SQS](#sqs)
   - [S3](#s3)
@@ -8,18 +9,31 @@
 - [IAM](#iam)
 - [Cognito](#cognito)
 - [Security Token Service](#security-token-service)
-- [ECS](#dynamodb)
+- [ECS](#ecs)
 - [CI/CD](#ci-cd)
+- [EC2](#ec2)
 
 ## Serverless
 - Lambda, Fargate, EventBridge, Step Functions, SQS, SNS, API Gateway, AppSync, S3, DynamoDB, RDS Proxy, Aurora Serverless
+
+### Lambda
+#### Versioning
+- When you create a Lambda function, there is only one version: $LATEST. 
+- You can refer to the function using its Amazon Resource Name (ARN). There are two ARNs associated with this initial version, the qualified ARN which is the function ARN plus a version suffix e.g. $LATEST. Or the unqualified ARN which is the function ARN without the version suffix. 
+- The function version for an unqualified function always maps to $LATEST, so you can access the latest version using either the qualified ARN with $LATEST, or the unqualified function ARN. 
+- Lambda also supports creating aliases for each of your Lambda function versions. An alias is a pointer to a specific Lambda function version, aliases will not be updated automatically when a new version of the function becomes available.
+
 ### DynamoDB
 - Primary key attribute must be defined as type string, number, or binary
+- All DynamoDB tables are encrypted at rest using an AWS owned CMK by default. Non-encrypted DynamoDB tables are no longer supported in AWS. You have the option to pick an alternative AWS or Customer Managed KMS key if required
+- A well designed Sort key allows you to retrieve groups of related items and query based on a range of values, e.g. a range of dates
 
 #### Query vs Scan 
 | Query | Scan|
 |---|--|
 |finds items based on primary key values|reads every item in a table or a secondary index|
+
+**Projection Expression** - to retrieve select attributes after a Query or Scan
 
 #### Indexes
 | Local Secondary Index | Global Secondary Index|
@@ -29,6 +43,8 @@
 |Different sort key|Different sort key|
 
 #### Provisioned Throughput 
+- A read capacity unit is 4KB in size
+
 Strongly Consistent Reads 
 ```
 size of each item / 4 KB (round) * # of reads per second
@@ -48,7 +64,6 @@ size of each item / 1 KB (round) * # of writes per second
 - FIFO queues 
 - SQS has a maximum message size of 256 KB
 #### Short & Long Polling
-
 By default queues use short polling.
 
 ##### Short polling
@@ -63,7 +78,7 @@ By default queues use short polling.
 
 #### Visibility timeout
 
-When a consumer receives and processes a message from the queue, the message remains in the queue. SQS does not automatically delete the message. When the message is received, it remains in the queue. To prevent other consumers from processing the message again, Amazon SQS set a visibility timeout, a period of time that prevents other consumers from receiving and processing the message. The default is 30 seconds, min is 0 sec and max is 12 hr.
+When a consumer receives and processes a message from the queue, the message remains in the queue. SQS does not automatically delete the message. When the message is received, it remains in the queue. To prevent other consumers from processing the message again, Amazon SQS set a visibility timeout, a period of time that prevents other consumers from receiving and processing the message **after it has been consumed**. The default is 30 seconds, min is 0 sec and max is 12 hr.
 
 #### Delay Queues
 - Postpone the delivery of new messages to a queue for a number of seconds
@@ -90,16 +105,23 @@ Allows you to set aside and isolate messages that cant be processed correctly to
 
 ### S3
 - Files can be between 0-5TB
+- The largest file you can transfer to S3 using a PUT operation is 5GB
 - AWS recommends that you use Multipart Upload for files larger than 100MB
 - S3 Transfer Acceleration is recommended to increase upload speeds and especially useful in cases where your bucket resides in a Region other than the one in which the file transfer was originated
+- Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact with resources in a different domain
+- S3 buckets do not directly support HTTPS with a custom domain name
+
 #### Encryption
-- If file is to be encrypted at upload time, the x-amz-server-side-encryption parameter will be included in request header 
+- If file is to be encrypted at upload time, the `x-amz-server-side-encryption` parameter will be included in request header 
 - Server-Side Encryption
     - S3 Managed Keys – SSE-S3 
     - AWS Key management Services KMS, managed keys - SSE-KMS 
     - Server side encryption with customer provided keys – SSE-C 
 - Client Side Encryption
     - Customer encrypts files before upload by leveraging AWS Encryption SDK
+
+## EC2
+It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
 
 ## Elastic Beanstalk
 ### Supported Platforms
@@ -111,14 +133,14 @@ Programming languages (Go, Java, Node.js, PHP, Python, Ruby), application server
     <td><ul><li>The quickest deployment method</li>
     <li>Application might be unavailable to users (or have low availability) for a short time</li>
     <li>If update fails, you need to rollback the changes by re-deploying the original version to all your instances  </li>
-    <li>All instances are out of service while deployment takes place </li>
+    <li>All instances are out of service while deployment takes place </li><li>An all at once is suitable if you can accept a short loss of service, and if quick deployments are important to you</li>
     </ul></td>
   </tr>
   <tr>
     <th >Rolling</th>
     <td><ul><li> Deploys new version in batches </li>
     <li>Deploys new version in batches </li>
-    <li>Reduced capacity during deployment  </li>
+    <li>Reduced capacity during deployment  </li><li>Rolling is suitable if you can't accept any period of completely lost service. With this method, your application is deployed to your environment one batch of instances at a time</li>
     </ul></td>
   </tr>
     <th>Rolling with additional batch</th>
@@ -155,8 +177,10 @@ User pools are user directories that provide sign-up and sign-in options for you
 Amazon Cognito Sync is an AWS service and client library that enables cross-device syncing of application-related user data. You can use it to synchronize user profile data across mobile devices and the web without requiring your own backend. The client libraries cache data locally so your app can read and write data regardless of device connectivity status. When the device is online, you can synchronize data, and if you set up push sync, notify other devices immediately that an update is available.
 
 #### Cognito Streams
+Amazon Cognito Streams gives developers control and insight into their data stored in Amazon Cognito
 
 #### Cognito Events
+Amazon Cognito Events allows you to execute an AWS Lambda function in response to important events in Amazon Cognito
 
 ### Identity pools
 Identity pools enable you to grant your users access to other AWS services.
@@ -168,6 +192,9 @@ Identity pools enable you to grant your users access to other AWS services.
 STS AssumeRoleWithWebIdentity returns a set of temporary security credentials for users who have been authenticated in a mobile or web application with a web identity provider.
 
 ## ECS 
+- AWS Fargate is a compute engine for Amazon ECS that allows you to run containers without having to manage servers or clusters
+- ECS stands for Elastic Container Service: It manages running containers on your EC2 instances
+- The policy must be attached to the ECS Task's execution role to allow the application running in the container access SQS
 
 ### Docker 
 
@@ -205,7 +232,19 @@ docker push $REPOSITORY_URI:latest
 ```
 
 ## Cloudformation
-- Termination Protection - can be enabled to prevent a stack from being accidentally deleted
+- **Stack Termination Protection** - can be enabled to prevent a stack from being accidentally deleted. Similarly, the **'cloudformation:DeleteStack' Action** applies to entire stack(s)
+- The **DeletionPolicy** attribute can be used to preserve a specific resource when its stack is deleted
+- The **DeletionPolicy Retain** option can be used to ensure AWS CloudFormation keeps the resource without deleting the resource
 - cfn-init helper script can be used to install packages, create files, and start/stop services 
 
 ## Kinesis
+
+## Cloudfront 
+
+## ElastiCache
+- CloudFront and ElastiCache are both caching technologies which can be used to improve performance of web applications, by caching data and content
+- ElastiCache is the best option for storing session state as it is scalable, highly available and can be accessed by multiple web servers
+
+## CloudWatch
+- With detailed monitoring, data is available in 1-minute periods for an additional charge.
+- If you want to collect metrics at 10 second intervals, you need to use high-resolution metrics
