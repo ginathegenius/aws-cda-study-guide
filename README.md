@@ -12,11 +12,23 @@
 - [ECS](#ecs)
 - [CI/CD](#ci-cd)
 - [EC2](#ec2)
+- [Elastic Load Balancer](#elastic-load-balancer)
+- [RDS](#rds)
+- [Cloudformation](#cloudformation)
+- [Kinesis](#kinesis)
+- [Cloudfront](#cloudfront)
+- [ElastiCache](#elasticache)
+- [CloudWatch](#cloudwatch)
+- [X-Ray](#x-ray)
+- [Secrets Manager & Parameter Store](#secrets-manager-&-parameter-store)
+
 
 ## Serverless
 - Lambda, Fargate, EventBridge, Step Functions, SQS, SNS, API Gateway, AppSync, S3, DynamoDB, RDS Proxy, Aurora Serverless
 
 ### Lambda
+- If a Lambda function is connected to a VPC, it must have a route out to the internet via a NAT Gateway or NAT instance in order to connect to external services.
+- You must also ensure that the relevant Security Groups and Network Access Control Lists are configured to allow the required ports.
 #### Versioning
 - When you create a Lambda function, there is only one version: $LATEST. 
 - You can refer to the function using its Amazon Resource Name (ARN). There are two ARNs associated with this initial version, the qualified ARN which is the function ARN plus a version suffix e.g. $LATEST. Or the unqualified ARN which is the function ARN without the version suffix. 
@@ -106,8 +118,8 @@ Allows you to set aside and isolate messages that cant be processed correctly to
 ### S3
 - Files can be between 0-5TB
 - The largest file you can transfer to S3 using a PUT operation is 5GB
-- AWS recommends that you use Multipart Upload for files larger than 100MB
-- S3 Transfer Acceleration is recommended to increase upload speeds and especially useful in cases where your bucket resides in a Region other than the one in which the file transfer was originated
+- AWS recommends that you use **Multipart Upload** for files larger than 100MB
+- **S3 Transfer Acceleration** is recommended to increase upload speeds and especially useful in cases where your bucket resides in a Region other than the one in which the file transfer was originated
 - Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact with resources in a different domain
 - S3 buckets do not directly support HTTPS with a custom domain name
 
@@ -120,8 +132,22 @@ Allows you to set aside and isolate messages that cant be processed correctly to
 - Client Side Encryption
     - Customer encrypts files before upload by leveraging AWS Encryption SDK
 
+### API Gateway
+- API Gateway supports RESTful APIs, however the legacy SOAP protocol, which returns results in xml format, is also supported in pass-through mode
+- If your existing services return XML-style data, you can use the API Gateway to transform the output to JSON
+
+
 ## EC2
 It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
+
+## Elastic Load Balancer
+- It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
+- 
+
+
+
+## RDS
+- Security best practice would state that RDS Database instances should be deployed to a private subnet. A private subnet would only have private IP's with no direct access to the public internet. Outbound connectivity would be provided via a NAT gateway. Thus, a route table entry with destination 0.0.0.0/0 and target is a suitable choice for deploying RDS instances as it is characterized as a private subnet
 
 ## Elastic Beanstalk
 ### Supported Platforms
@@ -248,3 +274,22 @@ docker push $REPOSITORY_URI:latest
 ## CloudWatch
 - With detailed monitoring, data is available in 1-minute periods for an additional charge.
 - If you want to collect metrics at 10 second intervals, you need to use high-resolution metrics
+- CloudWatch dashboards are customizable home pages in the CloudWatch console that you can use to monitor your resources in a single view, even those resources that are spread across different Regions
+
+## X-Ray
+- In Amazon ECS, create a Docker image that runs the X-Ray daemon, upload it to a Docker image repository, and then deploy it to your Amazon ECS cluster
+- X-Ray provides an official Docker container image that you can deploy alongside your application
+- X-Ray can be used with applications running on EC2, ECS, Lambda, Amazon SQS, Amazon SNS and Elastic Beanstalk
+-  If you’re using Elastic Beanstalk, you will need to include the language-specific X-Ray libraries in your application code. For applications running on other AWS services, such as EC2 or ECS, you will need to install the X-Ray agent and instrument your application code.
+
+
+## Secrets Manager & Parameter Store
+|Secrets Manager|Both|Parameter Store|
+|--------------|----|----------------|
+||Integrated with Identity and Access Management||
+||Can store credentials in hierarchical form ||
+||Supports encryption at rest using customer-owned KMS keys||
+|enables you to store, retrieve, control access to, rotate, audit, and monitor secrets centrally||provides secure, hierarchical storage for configuration data management and secrets management|
+|charges you for storing each secret|||
+|provides a secret rotation service||||
+
