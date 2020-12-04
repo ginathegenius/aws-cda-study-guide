@@ -129,6 +129,7 @@ Allows you to set aside and isolate messages that cant be processed correctly to
     - S3 Managed Keys – SSE-S3 
     - AWS Key management Services KMS, managed keys - SSE-KMS 
     - Server side encryption with customer provided keys – SSE-C 
+    - Server side encryption can be enforced by using a bucket policy to deny any S3 PUT that doesn’t include the parameter in the header 
 - Client Side Encryption
     - Customer encrypts files before upload by leveraging AWS Encryption SDK
 
@@ -139,6 +140,13 @@ Allows you to set aside and isolate messages that cant be processed correctly to
 
 ## EC2
 It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
+
+|Type | Description| Use Case|
+|-----|------------|---------|
+|On-Demand|Allows you to pay a fixed rate by the hour or by the second with no commitment|Apps w short term, spiky, unpredictable workloads that cannot be interrupted, first time development |
+|Reserved|Capacity reservation, offers a significant discount on the hourly charge for an instance, contract terms are 1 year or 3 year (3 year is a better deal)|Apps w steady state and expected to run for 1 / 3 years.|
+|Spot|Enables you to bid whatever price you want for instance capacity|Apps w flexible start and end times|
+|Dedicated|Physical EC2 server dedicated for your use|Apps that must follow regulatory requirements that may not support multi-tenant virtualization|
 
 ## Elastic Load Balancer
 - It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
