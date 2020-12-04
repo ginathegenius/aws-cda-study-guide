@@ -148,10 +148,22 @@ It is best practice to deploy the SSL certificates on the Load Balancer. This im
 |Spot|Enables you to bid whatever price you want for instance capacity|Apps w flexible start and end times|
 |Dedicated|Physical EC2 server dedicated for your use|Apps that must follow regulatory requirements that may not support multi-tenant virtualization|
 
+**FIGHT DR MC PXZ**
+## EBS
+- Storage volumes that can be attached to EC2 instances
+- Always have to have EBS volumes in same AZ as EC2 instance  
+
+### SSD 
+- General Purpose SSD GP2 – balances price and performance for a wide variety of workloads, 3IOPS per sec, **up to max of 16,000 IOPS per volume**, boot volumes or dev/test 
+- Provisioned IOPS SSD IO1 – highest performance SSD volume for mission critical low latency or high throughput workloads, databases. **Up to 64000 IOPS per volume, 50 IOPS per GB Use if you need more than 16000 IOPS** 
+- Provisioned IOPS SSD IO2 – latest generation, higher durability more IOPS per gig. Same price as IO1. 500IOPS per GB, up to 64,000 IOPS
+### Magnetic
+- Throughput Optimized HDD ST1 – low cost HDD volume designed for frequently accessed, throughput-intensive workloads, data warehouses 
+- Cold HDD – lowest cost HDD volume designed for less frequently access workloads (file servers)
+- Magnetic – previous generation, root device volume 
+
 ## Elastic Load Balancer
 - It is best practice to deploy the SSL certificates on the Load Balancer. This implements SSL termination on the load balancer and off-loads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances
-- 
-
 
 
 ## RDS
@@ -219,6 +231,12 @@ Amazon Cognito Events allows you to execute an AWS Lambda function in response t
 ### Identity pools
 Identity pools enable you to grant your users access to other AWS services.
 
+## KMS
+
+### Envelope Encryption
+The benefit is data key is used locally in your app or aws service, avoiding need to transfer large amounts of data to KMS 
+
+The Customer Master Key is used to encrypt and decrypt the Data Key or Envelope Key. The Data Key or Envelope Key is used to encrypt and decrypt your files. AWS Managed Customer Master Keys cannot be used to directly encrypt and decrypt files, since permissions cannot be changed to them. Customer Managed Customer Master Keys can be used with the KMS command to encrypt the file, when Key Usage rights are given. 
 
 
 ## Security Token Service
@@ -278,6 +296,11 @@ docker push $REPOSITORY_URI:latest
 ## ElastiCache
 - CloudFront and ElastiCache are both caching technologies which can be used to improve performance of web applications, by caching data and content
 - ElastiCache is the best option for storing session state as it is scalable, highly available and can be accessed by multiple web servers
+
+|Type|Use Case|
+|----|----|
+|Memcache|Object caching is primary goal (e.g. offload db), simple caching model|
+|Redis|Advanced data types, sorting/ranking datasets, multiple AZ, pub/sub|
 
 ## CloudWatch
 - With detailed monitoring, data is available in 1-minute periods for an additional charge.
